@@ -208,10 +208,32 @@ app.get('/get-product-details', async (req, res) => {
 });
 
 
+// Define the route for GET /get-all-products
+app.get('/get-all-products', async (req, res) => {
+    try {
+        const products = await Product.find().populate('userId', 'email');
+
+        const formattedProducts = products.map(product => ({
+            productName: product.productName,
+            price: product.price,
+            description: product.description,
+            status: product.status,
+            category: product.category,
+            productImage: product.productImage.data.toString('base64'), // Keep image as is
+            userId: product.userId._id,
+            userEmail: product.userId.email
+        }));
+
+        res.json(formattedProducts);
+    } catch (error) {
+        console.error('Error fetching all products:', error);
+        res.status(500).send('Error fetching all products');
+    }
+});
+
 
 // Add Product Endpoint with image upload
 app.post('/add-product', async (req, res) => {
-    // Check if user is logged in
     if (!req.session.userId) {
         return res.status(401).send('Unauthorized');
     }
