@@ -150,6 +150,36 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Admin Login Endpoint
+app.get('/adminLogin', async (req, res) => {
+    const { email, password } = req.query; // Assuming email and password are sent as query parameters
+
+    try {
+        // Find admin by email
+        const admin = await Admin.findOne({ email });
+
+        if (!admin) {
+            return res.status(404).send('Admin not found');
+        }
+
+        // Compare passwords
+        const passwordMatch = (admin.password === password);
+
+        if (!passwordMatch) {
+            return res.status(400).send('Invalid password');
+        }
+
+        // Assuming admin login is successful
+
+        res.json({ adminId: admin._id, message: 'Admin login successful' });
+    } catch (error) {
+        console.error('Error logging in admin:', error);
+        res.status(500).send('Error logging in admin');
+    }
+});
+
+
+
 
 app.get('/get-user-profile', async (req, res) => {
     const userId = req.query.userId;
@@ -214,6 +244,7 @@ app.get('/get-all-products', async (req, res) => {
         const products = await Product.find().populate('userId', 'email');
 
         const formattedProducts = products.map(product => ({
+            _id: product._id, // Add product ID
             productName: product.productName,
             price: product.price,
             description: product.description,
@@ -293,7 +324,6 @@ app.post('/add-product', async (req, res) => {
 });
 
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(3000, '192.168.1.2', () => {
+    console.log('Server is running on http://192.168.1.2:3000');
 });
