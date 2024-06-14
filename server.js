@@ -351,7 +351,7 @@ app.use(session({
     saveUninitialized: false
 }));
 
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect('mongodb+srv://guillsango:gu6FoXUc5xUJe72m@streaming.m5diqrb.mongodb.net/EcommerceApp', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
