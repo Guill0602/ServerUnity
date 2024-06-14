@@ -336,22 +336,12 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// MongoDB URI (replace with your actual MongoDB URI)
+// MongoDB URI with SSL/TLS configuration
 const MONGODB_URI = 'mongodb+srv://guillsango:gu6FoXUc5xUJe72m@streaming.m5diqrb.mongodb.net/EcommerceApp';
-
-// Configure multer for file uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-// Middleware setup
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
-app.use(cors());
 
 // Setup MongoDB session store
 const store = new MongoDBStore({
@@ -371,10 +361,15 @@ app.use(session({
     store: store // Use MongoDBStore for session storage
 }));
 
+// Middleware setup
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+app.use(cors());
+
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true, // no longer needed, but harmless to leave it in older versions
-    useUnifiedTopology: true // no longer needed, but harmless to leave it in older versions
+    useNewUrlParser: true, // Deprecated but harmless in older versions
+    useUnifiedTopology: true // Deprecated but harmless in older versions
 }).then(() => {
     console.log('Connected to MongoDB');
 }).catch(err => {
