@@ -331,35 +331,57 @@
 
 const express = require('express');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const session = require('express-session');
 const multer = require('multer');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// MongoDB URI (replace with your actual MongoDB URI)
+const MONGODB_URI = 'mongodb+srv://guillsango:gu6FoXUc5xUJe72m@streaming.m5diqrb.mongodb.net/EcommerceApp';
+
+// Configure multer for file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+// Middleware setup
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.use(cors());
 
+// Setup MongoDB session store
+const store = new MongoDBStore({
+    uri: MONGODB_URI,
+    collection: 'sessions' // Collection name for sessions
+});
+
+store.on('error', function(error) {
+    console.error('Session store error:', error);
+});
+
+// Express session middleware
 app.use(session({
     secret: process.env.SECRET_KEY || 'your_secret_key',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store: store // Use MongoDBStore for session storage
 }));
 
-mongoose.connect('mongodb+srv://guillsango:gu6FoXUc5xUJe72m@streaming.m5diqrb.mongodb.net/EcommerceApp', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+// Connect to MongoDB
+mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true, // no longer needed, but harmless to leave it in older versions
+    useUnifiedTopology: true // no longer needed, but harmless to leave it in older versions
 }).then(() => {
     console.log('Connected to MongoDB');
 }).catch(err => {
     console.error('Failed to connect to MongoDB', err);
 });
 
+// Define MongoDB schemas and models (add your own as needed)
 const idNumberSchema = new mongoose.Schema({
     id_number: String
 });
