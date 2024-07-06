@@ -256,6 +256,52 @@ app.get('/adminLogin', async (req, res) => {
     }
 });
 
+// Get all users
+app.get('/get-all-users', async (req, res) => {
+    try {
+        const users = await User.find().select('email id_number');
+        res.json(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).send('Error fetching users');
+    }
+});
+
+// Edit user details
+app.put('/edit-user/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    const { email, id_number } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        user.email = email || user.email;
+        user.id_number = id_number || user.id_number;
+
+        await user.save();
+        res.status(200).send('User updated successfully');
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).send('Error updating user');
+    }
+});
+
+// Delete a user
+app.delete('/delete-user/:userId', async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        await User.findByIdAndDelete(userId);
+        res.status(200).send('User deleted successfully');
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).send('Error deleting user');
+    }
+});
+
 app.get('/get-user-profile', async (req, res) => {
     const userId = req.query.userId;
 
