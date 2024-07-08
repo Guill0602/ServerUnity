@@ -97,7 +97,7 @@ const productSchema = new mongoose.Schema({
     description: String,
     status: {
         type: String,
-        enum: ['New', 'Sports Equipment']
+        enum: ['New', 'Used']
     },
     category: {
         type: String,
